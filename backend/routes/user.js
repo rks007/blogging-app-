@@ -3,7 +3,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const JWT_SECRET = require('../config');
 const userInput = require('../inputValidation/userValidation');
-const { User } = require('../db/db');
+const { User, Blog } = require('../db/db');
+const authMiddleware = require('../middlewares/authMiddleware');
+const blogInput = require('../inputValidation/blogValidation');
 const router = express.Router();
 
 router.post('/signup', async (req, res) => {
@@ -97,6 +99,30 @@ router.post('/signin', async (req, res) => {
         res.status(500).json({ msg: "Server error" });
     }
 
+})
+
+router.post('/create', authMiddleware, (req, res) => {
+    const title = req.body.title;
+    const description = req.body.description;
+
+    const parsedCredentials = blogInput.safeParse({
+        title, description
+    })
+    if(!parsedCredentials.success){
+        return res.status(401).json({
+            msg: "wrong input"
+        })
+    }
+
+    const newBlog = Blog.create({
+        userId: req.userId,
+        title: title,
+        description: description
+    })
+
+    res.status(200).json({
+        msg: "blog created successfully"
+    })
 })
 
 module.exports = router;

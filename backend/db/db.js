@@ -25,8 +25,25 @@ const UserSchema = new mongoose.Schema({
     }
 })
 
+const BlogSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
+    title: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+        required: true
+    }
+})
+
 const User = mongoose.model('User', UserSchema);
+const Blog = mongoose.model('Blog', BlogSchema);
 
 module.exports = {
-    User
+    User,
+    Blog
 }
